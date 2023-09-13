@@ -6,9 +6,9 @@ from show_bar_line import show_bar
 
 
 
-# @st.cache_data
-# 读取Excel文件中的数据
+@st.cache_data
 def read_excel(file_path):
+    # 读取Excel文件中的数据
     """参数:file_path.\n
     读取指定路径下的文件"""
     return pd.read_excel(file_path, sheet_name="数据源", skiprows=1)
@@ -66,14 +66,19 @@ def lots_data(get_data,gys_choice,date_range):
 
 def show_table_to_web(data):
     """将从Excel读取的数据加载到内存并展示到web页面上"""
-    with st.status("数据加载",state="running"):
+    with st.status("数据加载",state="running") as status:
         st.dataframe(data=data, use_container_width=True)
+        status.update(label="加载完成", state = "complete")
+    # with st.spinner("正在加载，请稍后。。。"):
+    #     st.dataframe(data=data, use_container_width=True)
+    # st.success("加载完成")
+    
 
 
 
 def fun_run():
     # 数据路径
-    data_path = "./外O成品数据.xlsx"
+    data_path = "./product_data_of_oem.xlsx"
     # 1、获取数据
     get_data = read_excel(data_path)
 
@@ -85,7 +90,7 @@ def fun_run():
     # 3、展示供应商合格率走势。
     st.markdown("##### 二、展示各供应商产品质量水平")
     # 创建一个下拉列表：
-    gys_choice = st.selectbox("1.选择供应商",["砺峰","兆驰","曼申","方汇","樱花"])
+    gys_choice = st.selectbox("1.选择供应商",["lifeng","zhaochi","manshen","fanghui","yinghua"])
     # 创建月份范围选框
     date_range = st.slider("2.请选择日期范围：(默认是当前月份)",1,12,(1,datetime.datetime.now().month))
     # min_value, max_value = date_range[0],date_range[1]
