@@ -69,6 +69,9 @@ def show_table_to_web(data):
     with st.status("数据加载",state="running") as status:
         st.dataframe(data=data, use_container_width=True)
         status.update(label="加载完成", state = "complete")
+    if st.button("rerun"):
+        st.cache_data.clear()
+
     # with st.spinner("正在加载，请稍后。。。"):
     #     st.dataframe(data=data, use_container_width=True)
     # st.success("加载完成")
@@ -80,7 +83,10 @@ def fun_run():
     # 数据路径
     data_path = "./product_data_of_oem.xlsx"
     # 1、获取数据
+
     get_data = read_excel(data_path)
+
+
 
     # 2、显示在页面
     st.markdown("##### 一、数据加载")
