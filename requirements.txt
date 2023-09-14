@@ -2,3 +2,4 @@ streamlit
 streamlit_echarts
 pandas
 datetime
+openpyxl
