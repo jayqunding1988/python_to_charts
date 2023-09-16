@@ -132,7 +132,7 @@ def info():
     ep = st.empty()
     # 用户输入验证信息后再继续跳转
     st.sidebar.markdown("## 请输入密码：")
-    psw = st.sidebar.text_input("请输入6位数的密码",type="password")
+    psw = st.sidebar.text_input("请输入密码",type="password")
     if psw in GYS_CHOOSE_LIST:
         st.sidebar.write(f"当前用户:<u>{psw}</u>",unsafe_allow_html=True)
         # # 用户输入供应商的名称
