@@ -128,7 +128,7 @@ def info():
     # 创建判断后存储输入供应商名称的列表
     # size_up = list()
 
-
+    
     ep = st.empty()
     # 用户输入验证信息后再继续跳转
     st.sidebar.markdown("## 请输入密码：")

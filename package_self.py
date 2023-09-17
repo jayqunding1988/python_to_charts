@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 import datetime
 import os
+import base64
 """
 read_excel
 date_selected
@@ -44,8 +45,13 @@ def show_table_to_web(data):
             
         if cl1.button("重新加载",help="清楚缓存，重新读取和载人"):
             st.cache_data.clear()
-        if cl2.button("导出Excel",help=f"导出Excel文件到{downloads}"):
-            data.to_excel(downloads+"/new_data.xlsx",index=False)
+        # if cl2.button("导出Excel",help=f"导出Excel文件到{downloads}"):
+        #     data.to_excel(downloads+"/new_data.xlsx",index=False)
+        # 添加下载的连接格式是csv
+        to_csv = data.to_csv(index=False)
+        b64 = base64.b64encode(to_csv.encode()).decode()
+        href = f'<a href="data:file/to_csv;base64,{b64}" download="data_table.csv">点击此处下载 CSV 文件</a>'
+        cl2.markdown(href,unsafe_allow_html=True)
 
     # with st.spinner("正在加载，请稍后。。。"):
     #     st.dataframe(data=data, use_container_width=True)
