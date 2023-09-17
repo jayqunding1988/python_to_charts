@@ -3,4 +3,3 @@ streamlit_echarts
 pandas
 datetime
 openpyxl
-base64
