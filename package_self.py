@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 import datetime
-import os
+# import os
 import base64
 """
 read_excel
@@ -34,16 +34,16 @@ def date_selected():
 
 
 def show_table_to_web(data):
-    """将从Excel读取的数据加载到内存并展示到web页面上"""
+    """将从Excel读取的数据加载到内存并展示到web页面上,并提供下载的连接"""
     # 获取下载文件夹的路径,
-    downloads = os.path.join(os.path.expanduser("~"),'Downloads')
+    # downloads = os.path.join(os.path.expanduser("~"),'Downloads')
     with st.status("数据加载",state="running") as status:
         st.dataframe(data=data, use_container_width=True)
         status.update(label="加载完成", state = "complete")
     cl1,cl2 = st.columns(2)
     with st.container():
             
-        if cl1.button("重新加载",help="清楚缓存，重新读取和载人"):
+        if cl1.button("重新加载",help="清楚缓存，重新读取和载入"):
             st.cache_data.clear()
         # if cl2.button("导出Excel",help=f"导出Excel文件到{downloads}"):
         #     data.to_excel(downloads+"/new_data.xlsx",index=False)
