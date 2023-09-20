@@ -1,6 +1,6 @@
 import streamlit as st
 import datetime
-from show_bar_line import show_bar
+from show_bar_line import show_bar, draw_line
 from package_self import read_excel, show_table_to_web
 
 # 计算 总批数	OK批数	NG批数	批次合格率
@@ -63,6 +63,41 @@ def get_excel_data():
     return get_data
 
 
+def get_problem_data(data,gys_choice):
+    """
+    主要功能实现从读取excel数据中筛选出问题点进行归类和图表输出。\n
+    data:读取excel返回的值。\n
+    date_range:日期范围.\n
+    gys_choice:选择供应商。\n
+    return:返回一个字典
+    """
+    PROBLEMS_DESCRIBE = ["外观","装配","低错","功能","配件"]
+    dict_problem_data = {
+        # "months":[f"{i}月" for i in range(1,13)],
+        # "months":date_range,
+        "外观":[],
+        "装配":[],
+        "低错":[],
+        "功能":[],
+        "配件":[]
+    }
+
+    for i in range(1,13):
+        filtered_data = data[((((data["判定"]=="NG")|(data["判定"].isnull())) & (data["问题归属"]=="NG批")) & (data["月"]==f"{i}月")) & (data["供应商"]==gys_choice)]
+
+        problem_counts = filtered_data["问题分类"].value_counts()
+
+        #获取筛选出来的问题描述
+        get_problems = [i for i in problem_counts.keys()]
+
+        for problem in PROBLEMS_DESCRIBE:
+            if problem in get_problems:
+                dict_problem_data[problem].append(int(problem_counts[problem]))
+            else:
+                dict_problem_data[problem].append(0)
+    return dict_problem_data
+
+
 
 def fun_run(gys_list):
     """
@@ -101,12 +136,24 @@ def fun_run(gys_list):
     gys_choice = st.selectbox("1.选择供应商",gys_list)
     # 创建月份范围选框
     date_range = st.slider("2.请选择日期范围：(默认是当前月份)",1,12,(1,datetime.datetime.now().month))
+
     # min_value, max_value = date_range[0],date_range[1]
     total_num,OK_num,NG_num,per_num,date_list = lots_data(get_data=get_data,gys_choice=gys_choice,date_range=date_range)
-    with st.expander("图表展示::"):
+    with st.expander("图表展示:sunglasses:",expanded=True):
         with st.container():
             # 显示柱状图和折线图的组合图
+            st.markdown("###### :one:供应商批次合格率:")
             show_bar(total_num,OK_num,NG_num,per_num,date_list)
+        st.write("<hr>",unsafe_allow_html=True)
+        with st.container():
+            date_list = [f"{i}月" for i in range(date_range[0],(date_range[1]+1))]
+            dic_problem_data = get_problem_data(get_data,gys_choice)
+            legend_label = ["外观","装配","低错","功能","配件"]
+            st.markdown("###### :two:异常问题走势:")
+            draw_line(dic_problem_data["外观"],dic_problem_data["装配"],dic_problem_data["低错"],
+                      dic_problem_data["功能"],dic_problem_data["配件"],date_list,legend_label)
+
+    
 
 
 def info():
