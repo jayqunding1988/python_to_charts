@@ -98,8 +98,108 @@ def get_problem_data(data,gys_choice):
     return dict_problem_data
 
 
+def date_selelcted():
+    """
+    主要功能：通过滑动来选择相应的月份。\n
+    return: 返回的是一个元祖(0,9)
+    """
+    date_range = st.slider("2.请选择日期范围：(默认是当前月份)",1,12,(1,datetime.datetime.now().month))
+    return date_range
 
-def fun_run(gys_list):
+
+def same_product_dif_gys(get_data,date_range):
+    """
+    主要功能：展示出相同型号产品，不同供应商之间的质量水平差\n
+    get_data: 通过read_excel函数读取的数据\n
+    args:其他参数
+    """
+    # 创建临时存储数据的字典
+    # 第1个是存储:单个型号--->多个供应商列表；
+    many_models_gys = dict()
+    # 第2个是存储：单个型号----> 两个供应商数量的列表
+    simple_model_gys = dict()
+    # 第3个：型号列表，为后面使用st.dataframe(df)方法显示图表准备
+    model_list = list()
+    # 第4个：供应商列表，为后面使用st.dataframe(df)方法显示图表准备
+    gys_list = list()
+    # 第5个：是展示 Linechart图表的源数据。
+    show_linechart_in_row = list()
+
+    # 从get_data数据中筛选出型号，并将型号去重，以及转化成列表
+    get_model = get_data["型号"]
+    get_single_model_list = list(set(get_model))
+
+    # 遍历 get_single_model_list ,并通过筛选型号==型号元素，将对应型号所有的的供应商筛选出来（一个列表），并用：
+    # set()方法，将列表去重，并再转化成列表，最后装进 many_models_gys字典里 
+    for model in get_single_model_list:
+        get_gys_list = get_data[get_data["型号"]==model]["供应商"]
+        many_models_gys[model] = list(set(get_gys_list))
+
+    # 通过再遍历 many_models_gys字典，将keys和values拆成单个的列表，分别装进model_list和gys_list:
+    for key, value in many_models_gys.items():
+        # 判断 value的数据长度是否>1
+        if len(value) > 1:
+            simple_model_gys[key] = value
+            model_list.append(key)
+            model_list.append(key)
+            # 下面是通过value的长度进行遍历，并通过下标把value的元素添加到gys_list列表中。
+            for index in range(len(value)):
+                gys_list.append(value[index])
+
+    
+    # 对重复gys的字典进行遍历，取出每个gys下该相同型号的 月度批次合格率
+
+    for xinghao, gys_s in simple_model_gys.items():
+        for gys in gys_s:
+            # 一个临时存储的列表
+            tecent_ = list()
+            for date in range(date_range[0],date_range[1]+1):
+                OK_NG_data = get_data[((get_data["型号"] == xinghao) & (get_data["供应商"] == gys)) &
+                                      (get_data["月"] == f"{date}月")]
+
+                # print(OK_count, NG_count)
+                OK_count = OK_NG_data["判定"][OK_NG_data["判定"] == "OK"].count()
+                NG_count = OK_NG_data["判定"][OK_NG_data["判定"] == "NG"].count()
+                # print(f"{xinghao}，供应商为{gys},{date}月分的,OK lots为 {OK_count}")
+                # print(f"{xinghao}，供应商为{gys},{date}月分的,OK lots为 {NG_count}")
+                # print(f"{xinghao}，供应商为{gys},{date}月分的,批次合格率为 {(OK_count)/(NG_count+OK_count)}")
+
+                if OK_count + NG_count == 0:
+                    # print(f"{xinghao}，供应商为{gys},{date}月分的,批次合格率为{0}")
+                    pchgl = 0
+                    tecent_.append(pchgl)
+                else:
+                    # print(f"{xinghao}，供应商为{gys},{date}月分的,批次合格率为 {(OK_count)/(NG_count+OK_count)}")
+                    pchgl = (OK_count) / (NG_count + OK_count)
+                    tecent_.append(pchgl)
+            show_linechart_in_row.append(tecent_)
+    
+    st.checkbox("👈🏻_选择拉伸表查看", value=False,key="use_container_width")
+    # 展示数据的格式
+    show_modle = {
+        "model": model_list,
+        "gys": gys_list,
+        # "chart": [[random.randint(0, 5000) for _ in range(30)] for _ in range(len(gys_list))]
+        "chart": show_linechart_in_row
+    }
+    
+    # 展示数据：
+    st.dataframe(show_modle,
+                 column_config={
+                     "model":"👓产品型号",
+                     "gys":" 🚒供应商",
+                     "chart":st.column_config.LineChartColumn(
+                        label="🎢合格率对比走势",y_min=0,y_max=1
+                     )
+                 },
+                 hide_index=True,
+                 use_container_width=st.session_state.use_container_width
+                 )
+
+
+
+
+def fun_run(gys_list,psw):
     """
     gys_list: 用户输入的供应商名称列表
     """
@@ -111,6 +211,9 @@ def fun_run(gys_list):
     with st.container():
         if len(gys_list) ==1:
             show_table_to_web(get_data[get_data["供应商"]==gys_list[0]])
+
+        elif len(gys_list) > 1:
+            show_table_to_web(get_data)
 
         # elif len(gys_list) == 2:
         #     show_table_to_web(get_data[(get_data["供应商"]==gys_list[0]) | (get_data["供应商"]==gys_list[1])])
@@ -124,8 +227,6 @@ def fun_run(gys_list):
         #     show_table_to_web(get_data[(get_data["供应商"]==gys_list[0]) | (get_data["供应商"]==gys_list[1]) |
         #                                (get_data["供应商"]==gys_list[2]) |(get_data["供应商"]==gys_list[3]) |
         #                                (get_data["供应商"]==gys_list[4])])
-        elif len(gys_list) > 1:
-            show_table_to_web(get_data)
 
     
     # 3、展示供应商合格率走势。
@@ -135,7 +236,8 @@ def fun_run(gys_list):
 
     gys_choice = st.selectbox("1.选择供应商",gys_list)
     # 创建月份范围选框
-    date_range = st.slider("2.请选择日期范围：(默认是当前月份)",1,12,(1,datetime.datetime.now().month))
+    # date_range = st.slider("2.请选择日期范围：(默认是当前月份)",1,12,(1,datetime.datetime.now().month))
+    date_range = date_selelcted()
 
     # min_value, max_value = date_range[0],date_range[1]
     total_num,OK_num,NG_num,per_num,date_list = lots_data(get_data=get_data,gys_choice=gys_choice,date_range=date_range)
@@ -152,7 +254,10 @@ def fun_run(gys_list):
             st.markdown("###### :two:异常问题走势:")
             draw_line(dic_problem_data["外观"],dic_problem_data["装配"],dic_problem_data["低错"],
                       dic_problem_data["功能"],dic_problem_data["配件"],date_list,legend_label)
-
+        with st.container():
+            st.markdown("###### :three:同型号不同供应商之间对比")
+            if psw == "DSM":
+                same_product_dif_gys(get_data,date_range)
     
 
 
@@ -179,7 +284,7 @@ def info():
     ep = st.empty()
     # 用户输入验证信息后再继续跳转
     st.sidebar.markdown("## 请输入密码：")
-    psw = st.sidebar.text_input("请输入密码",type="password")
+    psw = st.sidebar.text_input("✍️🔢✅😀",type="password")
     if psw in GYS_CHOOSE_LIST:
         st.sidebar.write(f"当前用户:<u>{psw}</u>",unsafe_allow_html=True)
         # # 用户输入供应商的名称
@@ -194,11 +299,12 @@ def info():
         # if len(size_up) == len(gys_to_list):
         #     fun_run(gys_to_list)
         gys_input = psw.split(",")
-        fun_run(gys_input)
+        fun_run(gys_input,psw)
         # else:
         #     st.sidebar.warning("请输入正确的供应商名称")
     elif psw == "DSM":
-        fun_run(GYS_CHOOSE_LIST)
+        fun_run(GYS_CHOOSE_LIST,psw)
+
     else:
         st.sidebar.warning("请输入正确密码。。。")
         ep.markdown(
