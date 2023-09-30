@@ -3,6 +3,7 @@ import datetime
 from show_bar_line import show_bar, draw_line
 from package_self import read_excel, show_table_to_web
 
+
 # 计算 总批数	OK批数	NG批数	批次合格率
 def lots_data(get_data,gys_choice,date_range):
     """
@@ -19,24 +20,45 @@ def lots_data(get_data,gys_choice,date_range):
     NG_lots_list = list()
     percent_OK_list = list()
     date_select_list = list()
-    for date in range(date_range[0],date_range[1]+1):
-        lots_value = get_data[get_data["月"]==f"{date}月"][get_data["供应商"]==gys_choice]["判定"]
-        OK_lots = int((lots_value[get_data["判定"]=="OK"]).count())
-        NG_lots = int((lots_value[get_data["判定"]=="NG"]).count())
-        total_lots = OK_lots + NG_lots
-        if total_lots == 0:
-            percent_OK = 0
-        else:
-            percent_OK = float(round((float(round(OK_lots/total_lots,5)))*100,2))
-        total_lots_list.append(total_lots)
-        OK_lots_list.append(OK_lots)
-        NG_lots_list.append(NG_lots)
-        percent_OK_list.append(percent_OK)
-        date_select_list.append(f"{date}月")
-        # total_lots：总批数
-        # OK_lots：合格批数
-        # NG_lots：不合格批数
-        # percent_OK：批次合格率
+    if gys_choice != "all":
+        for date in range(date_range[0],date_range[1]+1):
+            lots_value = get_data[get_data["月"]==f"{date}月"][get_data["供应商"]==gys_choice]["判定"]
+            OK_lots = int((lots_value[get_data["判定"]=="OK"]).count())
+            NG_lots = int((lots_value[get_data["判定"]=="NG"]).count())
+            total_lots = OK_lots + NG_lots
+            if total_lots == 0:
+                percent_OK = 0
+            else:
+                percent_OK = float(round((float(round(OK_lots/total_lots,5)))*100,2))
+            total_lots_list.append(total_lots)
+            OK_lots_list.append(OK_lots)
+            NG_lots_list.append(NG_lots)
+            percent_OK_list.append(percent_OK)
+            date_select_list.append(f"{date}月")
+            # total_lots：总批数
+            # OK_lots：合格批数
+            # NG_lots：不合格批数
+            # percent_OK：批次合格率
+    else:
+        
+        for date in range(date_range[0],date_range[1]+1):
+            lots_value = get_data[get_data["月"]==f"{date}月"]["判定"]
+            OK_lots = int((lots_value[get_data["判定"]=="OK"]).count())
+            NG_lots = int((lots_value[get_data["判定"]=="NG"]).count())
+            total_lots = OK_lots + NG_lots
+            if total_lots == 0:
+                percent_OK = 0
+            else:
+                percent_OK = float(round((float(round(OK_lots/total_lots,5)))*100,2))
+            total_lots_list.append(total_lots)
+            OK_lots_list.append(OK_lots)
+            NG_lots_list.append(NG_lots)
+            percent_OK_list.append(percent_OK)
+            date_select_list.append(f"{date}月")
+            # total_lots：总批数
+            # OK_lots：合格批数
+            # NG_lots：不合格批数
+            # percent_OK：批次合格率
     
     return total_lots_list,OK_lots_list,NG_lots_list,percent_OK_list,date_select_list
 
@@ -81,20 +103,36 @@ def get_problem_data(data,gys_choice):
         "功能":[],
         "配件":[]
     }
+    if gys_choice != "all":
+        for i in range(1,13):
+            filtered_data = data[((((data["判定"]=="NG")|(data["判定"].isnull())) & (data["问题归属"]=="NG批")) & (data["月"]==f"{i}月")) & (data["供应商"]==gys_choice)]
 
-    for i in range(1,13):
-        filtered_data = data[((((data["判定"]=="NG")|(data["判定"].isnull())) & (data["问题归属"]=="NG批")) & (data["月"]==f"{i}月")) & (data["供应商"]==gys_choice)]
+            problem_counts = filtered_data["问题分类"].value_counts()
 
-        problem_counts = filtered_data["问题分类"].value_counts()
+            #获取筛选出来的问题描述
+            get_problems = [i for i in problem_counts.keys()]
 
-        #获取筛选出来的问题描述
-        get_problems = [i for i in problem_counts.keys()]
+            for problem in PROBLEMS_DESCRIBE:
+                if problem in get_problems:
+                    dict_problem_data[problem].append(int(problem_counts[problem]))
+                else:
+                    dict_problem_data[problem].append(0)
+    else:
 
-        for problem in PROBLEMS_DESCRIBE:
-            if problem in get_problems:
-                dict_problem_data[problem].append(int(problem_counts[problem]))
-            else:
-                dict_problem_data[problem].append(0)
+        for i in range(1,13):
+            filtered_data = data[((((data["判定"]=="NG")|(data["判定"].isnull())) & (data["问题归属"]=="NG批")) & (data["月"]==f"{i}月"))]
+
+            problem_counts = filtered_data["问题分类"].value_counts()
+
+            #获取筛选出来的问题描述
+            get_problems = [i for i in problem_counts.keys()]
+
+            for problem in PROBLEMS_DESCRIBE:
+                if problem in get_problems:
+                    dict_problem_data[problem].append(int(problem_counts[problem]))
+                else:
+                    dict_problem_data[problem].append(0)
+
     return dict_problem_data
 
 
@@ -235,23 +273,32 @@ def fun_run(gys_list,psw):
     # gys_choice = st.selectbox("1.选择供应商",["lifeng","zhaochi","manshen","fanghui","yinghua"])
 
     gys_choice = st.selectbox("1.选择供应商",gys_list)
+
     # 创建月份范围选框
     # date_range = st.slider("2.请选择日期范围：(默认是当前月份)",1,12,(1,datetime.datetime.now().month))
     date_range = date_selelcted()
 
     # min_value, max_value = date_range[0],date_range[1]
+
+
     total_num,OK_num,NG_num,per_num,date_list = lots_data(get_data=get_data,gys_choice=gys_choice,date_range=date_range)
     with st.expander("图表展示:sunglasses:",expanded=True):
         with st.container():
             # 显示柱状图和折线图的组合图
-            st.markdown("###### :one:供应商批次合格率:")
+            if gys_choice != "all":
+                st.markdown("###### :one:供应商批次合格率:")
+            else:
+                st.markdown("###### :one:外O整体批次合格率:")
             show_bar(total_num,OK_num,NG_num,per_num,date_list)
         st.write("<hr>",unsafe_allow_html=True)
         with st.container():
             date_list = [f"{i}月" for i in range(date_range[0],(date_range[1]+1))]
             dic_problem_data = get_problem_data(get_data,gys_choice)
             legend_label = ["外观","装配","低错","功能","配件"]
-            st.markdown("###### :two:异常问题走势:")
+            if gys_choice != "all":
+                st.markdown("###### :two:异常问题走势:")
+            else:
+                st.markdown("###### :two:外O整体异常问题:")
             draw_line(dic_problem_data["外观"],dic_problem_data["装配"],dic_problem_data["低错"],
                       dic_problem_data["功能"],dic_problem_data["配件"],date_list,legend_label)
         with st.container():
@@ -275,7 +322,7 @@ def info():
     st.markdown(page_of_info, unsafe_allow_html=True)
 
     # 指定供应商名称范围
-    GYS_CHOOSE_LIST = ["lifeng","zhaochi","manshen","fanghui","yinghua"]
+    GYS_CHOOSE_LIST = ["lifeng","zhaochi","manshen","fanghui","yinghua","all"]
 
     # 创建判断后存储输入供应商名称的列表
     # size_up = list()
