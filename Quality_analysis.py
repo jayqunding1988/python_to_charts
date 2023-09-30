@@ -286,7 +286,7 @@ def fun_run(gys_list,psw):
         with st.container():
             # 显示柱状图和折线图的组合图
             if gys_choice != "all":
-                st.markdown("###### :one:供应商批次合格率:")
+                st.markdown(f"###### :one:{gys_choice}批次合格率:")
             else:
                 st.markdown("###### :one:外O整体批次合格率:")
             show_bar(total_num,OK_num,NG_num,per_num,date_list)
@@ -296,7 +296,7 @@ def fun_run(gys_list,psw):
             dic_problem_data = get_problem_data(get_data,gys_choice)
             legend_label = ["外观","装配","低错","功能","配件"]
             if gys_choice != "all":
-                st.markdown("###### :two:异常问题走势:")
+                st.markdown(f"###### :two:{gys_choice}异常问题走势:")
             else:
                 st.markdown("###### :two:外O整体异常问题:")
             draw_line(dic_problem_data["外观"],dic_problem_data["装配"],dic_problem_data["低错"],
