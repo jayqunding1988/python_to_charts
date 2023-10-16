@@ -322,7 +322,7 @@ def info():
     st.markdown(page_of_info, unsafe_allow_html=True)
 
     # 指定供应商名称范围
-    GYS_CHOOSE_LIST = ["lifeng","zhaochi","manshen","fanghui","yinghua","all"]
+    GYS_CHOOSE_LIST = ["lifeng","zhaochi","manshen","fanghui","yinghua","oumaisi","all"]
 
     # 创建判断后存储输入供应商名称的列表
     # size_up = list()
