@@ -82,6 +82,10 @@ def get_excel_data():
     data_path = "./product_data_of_oem.xlsx"
 
     get_data = read_excel(data_path,sheet_name="数据源")
+    if "data" not in get_data:
+        st.session_state.data = None
+    st.session_state.data = get_data
+    
     return get_data
 
 
@@ -143,6 +147,7 @@ def date_selelcted():
     """
     date_range = st.slider("2.请选择日期范围：(默认是当前月份)",1,12,(1,datetime.datetime.now().month))
     return date_range
+
 
 
 def same_product_dif_gys(get_data,date_range):
@@ -332,8 +337,13 @@ def info():
     # 用户输入验证信息后再继续跳转
     st.sidebar.markdown("## 请输入密码：")
     psw = st.sidebar.text_input("✍️🔢✅😀",type="password")
-    if psw in GYS_CHOOSE_LIST:
-        st.sidebar.write(f"当前用户:<u>{psw}</u>",unsafe_allow_html=True)
+    if "psw" not in st.session_state:
+        st.session_state.pwd = None
+    st.session_state.psw = psw
+    # if psw in GYS_CHOOSE_LIST:
+    if st.session_state.psw in GYS_CHOOSE_LIST:
+        # st.sidebar.write(f"当前用户:<u>{psw}</u>",unsafe_allow_html=True)
+        st.sidebar.write(f"当前用户:<u>{st.session_state.psw}</u>",unsafe_allow_html=True)
         # # 用户输入供应商的名称
         # gys = st.sidebar.text_input("请输入供应商:point_right:",help="如果一次性输入多个供应商，请用逗号‘,’隔开：")
         # # 将供应商名称以逗号隔开并形成列表
@@ -345,12 +355,17 @@ def info():
         # # 根据判断后size_up列表和初始输入列表的长度对比，确认是否存在输入信息错误情况
         # if len(size_up) == len(gys_to_list):
         #     fun_run(gys_to_list)
-        gys_input = psw.split(",")
-        fun_run(gys_input,psw)
+        # gys_input = psw.split(",")
+        # fun_run(gys_input,psw)
+        # gys_input = psw.split(",")
+        gys_input = st.session_state.psw.split(",")
+        fun_run(gys_input,st.session_state.psw)
         # else:
         #     st.sidebar.warning("请输入正确的供应商名称")
-    elif psw == "DSM":
-        fun_run(GYS_CHOOSE_LIST,psw)
+    # elif psw == "DSM":
+    elif st.session_state.psw == "DSM":
+
+        fun_run(GYS_CHOOSE_LIST,st.session_state.psw)
 
     else:
         st.sidebar.warning("请输入正确密码。。。")

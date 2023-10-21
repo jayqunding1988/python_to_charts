@@ -325,3 +325,126 @@ def draw_line(y_data1,y_data2,y_data3,y_data4,y_data5,date_list, legend_label):
     }]}
     values_echart = st_echarts(options=option)
     return values_echart
+
+
+
+def plot_line_chart(datas,column_names,date_list):
+    # 用streamlit_echarts中的st_echarts展示出 可变数据 的折线图
+    # 定义图表配置
+    colors = ['#5470C6', '#91CC75', '#EE6666','green','lightblue']
+    option = {
+    "color": colors,
+    "tooltip": {
+        "trigger": 'axis',
+        "axisPointer": {
+        "type": 'cross'
+        }
+    },
+    "grid": {
+        "right": '5%'
+    },
+    "toolbox": {
+        "feature": {
+        "dataView": { "show": True, "readOnly": True },
+        "magicType": { "type": ['line', 'bar'] },
+        "restore": { "show": True },
+        "saveAsImage": { "show": True }
+        # "saveAsImage": {}
+        }
+    },
+    "legend": {
+        "data": column_names,
+        "checked": False,
+    },
+    "xAxis": [
+        {
+        "type": 'category',
+        "axisTick": {
+            "alignWithLabel": True
+        },
+        #   // prettier-ignore
+        "data": date_list
+        }
+    ],
+    "yAxis": [
+        {
+        "type": 'value',
+        "name": '数量',
+        "position": 'left',
+        "alignTicks": True,
+        "axisLine": {
+            "show": False,
+            "lineStyle": {
+            "color": colors[0]
+            }
+        },
+        # "axisLabel": {
+        #     "formatter": '{value}'
+        # }
+        },
+        {
+        "type": 'value',
+        "name": '',
+        "position": 'left',
+        "alignTicks": False,
+        "offset": 80,
+        "axisLine": {
+            "show": False,
+            "lineStyle": {
+            "color": colors[1]
+            }
+        },
+        # "axisLabel": {
+        #     "formatter": '{value}'
+        # }
+        },
+        {
+        "type": 'value',
+        "name": '',
+        "position": 'left',
+        "alignTicks": False,
+        "axisLine": {
+            "show": False,
+            "lineStyle": {
+                "color": colors[2]
+            }
+        },
+        # "axisLabel": {
+        #     "formatter": '{value}'
+        # }
+        },
+        {
+        "type": 'value',
+        "name": '',
+        "position": 'left',
+        "alignTicks": False,
+        "axisLine": {
+            "show": False,
+            "lineStyle": {
+                "color": colors[3]
+            }
+        },
+        "axisLabel": {
+            "formatter": '{value} %'
+        }
+        },
+        {
+        "type": 'value',
+        "name": '',
+        "position": 'left',
+        "alignTicks": False,
+        "axisLine": {
+            "show": False,
+            "lineStyle": {
+                "color": colors[3]
+            }
+        },
+        "axisLabel": {
+            "formatter": '{value} %'
+        }
+        }
+    ],
+    "series": datas}
+
+    values_echart = st_echarts(options=option)
+    return values_echart
