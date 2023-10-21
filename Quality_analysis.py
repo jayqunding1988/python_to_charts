@@ -314,6 +314,7 @@ def fun_run(gys_list,psw):
 
 
 def info():
+    
     """
     展示本页面的说明,\n
     并设置用户使用的密码。
@@ -331,14 +332,13 @@ def info():
 
     # 创建判断后存储输入供应商名称的列表
     # size_up = list()
-
+    
     
     ep = st.empty()
     # 用户输入验证信息后再继续跳转
     st.sidebar.markdown("## 请输入密码：")
     psw = st.sidebar.text_input("✍️🔢✅😀",type="password")
-    if "psw" not in st.session_state:
-        st.session_state.pwd = None
+   
     st.session_state.psw = psw
     # if psw in GYS_CHOOSE_LIST:
     if st.session_state.psw in GYS_CHOOSE_LIST:
@@ -388,4 +388,8 @@ def info():
 
 
 if __name__ == "__main__":
+    if "psw" not in st.session_state:
+        st.session_state.pwd = ""
+    if "data" not in st.session_state:
+        st.session_state.data = None
     info()

@@ -328,7 +328,7 @@ def draw_line(y_data1,y_data2,y_data3,y_data4,y_data5,date_list, legend_label):
 
 
 
-def plot_line_chart(datas,column_names,date_list):
+def draw_plot_line_chart(datas,column_names,date_list):
     # 用streamlit_echarts中的st_echarts展示出 可变数据 的折线图
     # 定义图表配置
     colors = ['#5470C6', '#91CC75', '#EE6666','green','lightblue']

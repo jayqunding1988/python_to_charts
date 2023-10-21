@@ -2,7 +2,7 @@ import streamlit as st
 from Quality_analysis import date_selelcted
 from package_self import read_excel
 # from streamlit_echarts import st_echarts
-from show_bar_line import plot_line_chart
+from show_bar_line import draw_plot_line_chart
 import time
 
 
@@ -111,60 +111,117 @@ if __name__ == "__main__":
    
     fetch_data = get_excel_data()
     # 读取唯一供应商，返回列表
-    supplier_list = fetch_data["供应商"].unique()
+
+    if fetch_data is not None:
+        supplier_list = fetch_data["供应商"].unique()
+        psw = st.session_state.psw
+        if psw in supplier_list:
+
+            # 展示供应商的选择
+            # supplier = st.selectbox("请选择供应商：", ["".join(psw)])
+            supplier = psw
+
+            all_products_data,column_names,date_list,supplier = show_diffrent_product_type(fetch_data,supplier)
+            st.sidebar.write(f"当前用户:<u>{psw}</u>",unsafe_allow_html=True)
+            
+            st.info(f"{supplier} 供应商生产  {len(column_names)}  种型号， 如下：",)
+            
+            if st.button("show name："):
+                # for name in column_names:
+                #     st.toast(name)
+                #     time.sleep(0.5)
+                st.success(column_names)
+
+            # st.table(column_names)
+            
+            draw_plot_line_chart(all_products_data,column_names,date_list)
+            
+        elif psw == "DSM":
+            supplier = st.selectbox("请选择供应商：", supplier_list)
+            all_products_data,column_names,date_list,supplier = show_diffrent_product_type(fetch_data,supplier)
+            st.sidebar.write(f"当前用户:<u>{psw}</u>",unsafe_allow_html=True)
+            
+
+            st.info(f"{supplier} 供应商生产{len(column_names)}种型号 如下点击按钮：",)
+
+            if st.button("查看型号：",help="请点击按钮查看型号"):
+                for name in column_names:
+                    st.toast(name)
+                    time.sleep(0.5)
+            
+            draw_plot_line_chart(all_products_data,column_names,date_list)
+        else:
+            # st.sidebar.warning("请输入正确密码。。。")
+            ep.markdown(
+                """
+            <p style='color:#008888;font-size:26px;'>
+            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp这是一个数据可视化的App页面.<br>
+            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp主要各每个型号产品合格率,多维度的展开和分析数据。<br><br>
+            <strong>主要内容：</strong><br>
+            <strong style='color:#8f3e6e;font-size:26px;'>综合显示</strong>：
+            所有生产型号的月度推移，折线图灵活选择并显示数据。<br><br>
+            <strong style='color:#8f3e6e;font-size:26px;'>选择节点数据</strong>： 
+            数据交互选择。<br><br>
+            <strong style='color:#8f3e6e;font-size:26px;'>导出图表和报告</strong>： 
+            用户可以导出生成的图表和分析报告，以便与团队或其他利益相关者共享。<br>
+            </p>""",unsafe_allow_html=True
+            )
+    else:
+        st.write("请先登录")
 
     # st.sidebar.markdown("## 请输入密码：")
     # psw = st.sidebar.text_input("✍️🔢✅😀",type="password")
-    psw = st.session_state.psw
+    # if "psw" not in st.session_state:
+    #     st.session_state.psw = "lifeng"
+    # psw = st.session_state.psw
+    # if psw in supplier_list:
 
-    if psw in supplier_list:
+    #     # 展示供应商的选择
+    #     # supplier = st.selectbox("请选择供应商：", ["".join(psw)])
+    #     supplier = psw
 
-        # 展示供应商的选择
-        # supplier = st.selectbox("请选择供应商：", ["".join(psw)])
-        supplier = psw
+    #     all_products_data,column_names,date_list,supplier = show_diffrent_product_type(fetch_data,supplier)
+    #     st.sidebar.write(f"当前用户:<u>{psw}</u>",unsafe_allow_html=True)
+        
+    #     st.info(f"{supplier} 供应商生产  {len(column_names)}  种型号， 如下：",)
+        
+    #     if st.button("show name："):
+    #         # for name in column_names:
+    #         #     st.toast(name)
+    #         #     time.sleep(0.5)
+    #         st.success(column_names)
 
-        all_products_data,column_names,date_list,supplier = show_diffrent_product_type(fetch_data,supplier)
-        st.sidebar.write(f"当前用户:<u>{psw}</u>",unsafe_allow_html=True)
+    #     # st.table(column_names)
         
-        st.info(f"{supplier} 供应商生产  {len(column_names)}  种型号， 如下：",)
+    #     plot_line_chart(all_products_data,column_names,date_list)
         
-        if st.button("show name："):
-            # for name in column_names:
-            #     st.toast(name)
-            #     time.sleep(0.5)
-            st.success(column_names)
-
-        # st.table(column_names)
-        
-        plot_line_chart(all_products_data,column_names,date_list)
-        
-    elif psw == "DSM":
-        supplier = st.selectbox("请选择供应商：", supplier_list)
-        all_products_data,column_names,date_list,supplier = show_diffrent_product_type(fetch_data,supplier)
-        st.sidebar.write(f"当前用户:<u>{psw}</u>",unsafe_allow_html=True)
+    # elif psw == "DSM":
+    #     supplier = st.selectbox("请选择供应商：", supplier_list)
+    #     all_products_data,column_names,date_list,supplier = show_diffrent_product_type(fetch_data,supplier)
+    #     st.sidebar.write(f"当前用户:<u>{psw}</u>",unsafe_allow_html=True)
         
 
-        st.info(f"{supplier} 供应商生产{len(column_names)}种型号 如下点击按钮：",)
+    #     st.info(f"{supplier} 供应商生产{len(column_names)}种型号 如下点击按钮：",)
 
-        if st.button("查看型号：",help="请点击按钮查看型号"):
-            for name in column_names:
-                st.toast(name)
-                time.sleep(0.5)
+    #     if st.button("查看型号：",help="请点击按钮查看型号"):
+    #         for name in column_names:
+    #             st.toast(name)
+    #             time.sleep(0.5)
         
-        plot_line_chart(all_products_data,column_names,date_list)
-    else:
-        # st.sidebar.warning("请输入正确密码。。。")
-        ep.markdown(
-            """
-        <p style='color:#008888;font-size:26px;'>
-	    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp这是一个数据可视化的App页面.<br>
-		&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp主要各每个型号产品合格率,多维度的展开和分析数据。<br><br>
-		<strong>主要内容：</strong><br>
-        <strong style='color:#8f3e6e;font-size:26px;'>综合显示</strong>：
-        所有生产型号的月度推移，折线图灵活选择并显示数据。<br><br>
-        <strong style='color:#8f3e6e;font-size:26px;'>选择节点数据</strong>： 
-        数据交互选择。<br><br>
-        <strong style='color:#8f3e6e;font-size:26px;'>导出图表和报告</strong>： 
-        用户可以导出生成的图表和分析报告，以便与团队或其他利益相关者共享。<br>
-		</p>""",unsafe_allow_html=True
-        )
+    #     plot_line_chart(all_products_data,column_names,date_list)
+    # else:
+    #     # st.sidebar.warning("请输入正确密码。。。")
+    #     ep.markdown(
+    #         """
+    #     <p style='color:#008888;font-size:26px;'>
+	#     &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp这是一个数据可视化的App页面.<br>
+	# 	&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp主要各每个型号产品合格率,多维度的展开和分析数据。<br><br>
+	# 	<strong>主要内容：</strong><br>
+    #     <strong style='color:#8f3e6e;font-size:26px;'>综合显示</strong>：
+    #     所有生产型号的月度推移，折线图灵活选择并显示数据。<br><br>
+    #     <strong style='color:#8f3e6e;font-size:26px;'>选择节点数据</strong>： 
+    #     数据交互选择。<br><br>
+    #     <strong style='color:#8f3e6e;font-size:26px;'>导出图表和报告</strong>： 
+    #     用户可以导出生成的图表和分析报告，以便与团队或其他利益相关者共享。<br>
+	# 	</p>""",unsafe_allow_html=True
+    #     )
