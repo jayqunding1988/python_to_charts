@@ -102,6 +102,17 @@ def show_diffrent_product_type(get_data,supplier):
 
 if __name__ == "__main__":
 
+    # 建立供应商密码：键值对
+    GYS_PSW = {
+        "lf_06w":"lifeng",
+        "zhc_07l":"zhaochi",
+        "msh_07x":"manshen",
+        "fh_07s":"fanghui",
+        "yh_07g":"yinghua",
+        "oms_07n":"oumaisi",
+        "DSM":"DSM",
+    }
+
     page_of_info = """
 	<h2 style='text-align:center; color:#ff8888'>产品型号数据展示</h2>
 
@@ -112,17 +123,17 @@ if __name__ == "__main__":
     fetch_data = get_excel_data()
     # 读取唯一供应商，返回列表
 
-    if fetch_data is not None:
+    if (fetch_data is not None) and (st.session_state.psw!=""):
         supplier_list = fetch_data["供应商"].unique()
         psw = st.session_state.psw
-        if psw in supplier_list:
+        if GYS_PSW[psw]in supplier_list:
 
             # 展示供应商的选择
             # supplier = st.selectbox("请选择供应商：", ["".join(psw)])
-            supplier = psw
+            supplier = GYS_PSW[psw]
 
             all_products_data,column_names,date_list,supplier = show_diffrent_product_type(fetch_data,supplier)
-            st.sidebar.write(f"当前用户:<u>{psw}</u>",unsafe_allow_html=True)
+            st.sidebar.write(f"当前用户:<u>{supplier}</u>",unsafe_allow_html=True)
             
             st.info(f"{supplier} 供应商生产  {len(column_names)}  种型号， 如下：",)
             
@@ -167,7 +178,7 @@ if __name__ == "__main__":
             </p>""",unsafe_allow_html=True
             )
     else:
-        st.write("请先登录")
+        st.warning("请先于Quality analysis页面登录")
 
     # st.sidebar.markdown("## 请输入密码：")
     # psw = st.sidebar.text_input("✍️🔢✅😀",type="password")

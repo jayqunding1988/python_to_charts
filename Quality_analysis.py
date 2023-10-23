@@ -330,6 +330,18 @@ def info():
     # 指定供应商名称范围
     GYS_CHOOSE_LIST = ["lifeng","zhaochi","manshen","fanghui","yinghua","oumaisi","all"]
 
+
+    # 建立供应商密码：键值对
+    GYS_PSW = {
+        "lf_06w":"lifeng",
+        "zhc_07l":"zhaochi",
+        "msh_07x":"manshen",
+        "fh_07s":"fanghui",
+        "yh_07g":"yinghua",
+        "oms_07n":"oumaisi",
+    }
+
+
     # 创建判断后存储输入供应商名称的列表
     # size_up = list()
     
@@ -341,9 +353,9 @@ def info():
    
     st.session_state.psw = psw
     # if psw in GYS_CHOOSE_LIST:
-    if st.session_state.psw in GYS_CHOOSE_LIST:
+    if st.session_state.psw in GYS_PSW.keys():
         # st.sidebar.write(f"当前用户:<u>{psw}</u>",unsafe_allow_html=True)
-        st.sidebar.write(f"当前用户:<u>{st.session_state.psw}</u>",unsafe_allow_html=True)
+        st.sidebar.write(f"当前用户:<u>{GYS_PSW[st.session_state.psw]}</u>",unsafe_allow_html=True)
         # # 用户输入供应商的名称
         # gys = st.sidebar.text_input("请输入供应商:point_right:",help="如果一次性输入多个供应商，请用逗号‘,’隔开：")
         # # 将供应商名称以逗号隔开并形成列表
@@ -358,7 +370,8 @@ def info():
         # gys_input = psw.split(",")
         # fun_run(gys_input,psw)
         # gys_input = psw.split(",")
-        gys_input = st.session_state.psw.split(",")
+        gys_input = GYS_PSW[st.session_state.psw].split(",")
+        # fun_run(gys_input,st.session_state.psw)
         fun_run(gys_input,st.session_state.psw)
         # else:
         #     st.sidebar.warning("请输入正确的供应商名称")
