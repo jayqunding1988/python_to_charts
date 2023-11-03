@@ -104,12 +104,12 @@ if __name__ == "__main__":
 
     # 建立供应商密码：键值对
     GYS_PSW = {
-        "lf_06w":"lifeng",
-        "zhc_07l":"zhaochi",
-        "msh_07x":"manshen",
-        "fh_07s":"fanghui",
-        "yh_07g":"yinghua",
-        "oms_07n":"oumaisi",
+        "lf_06w":"砺峰",
+        "zhc_07l":"兆驰",
+        "msh_07x":"曼申",
+        "fh_07s":"方汇",
+        "yh_07g":"樱花",
+        "oms_07n":"欧迈斯",
         "DSM":"DSM",
     }
 
