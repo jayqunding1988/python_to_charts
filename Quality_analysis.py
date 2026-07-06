@@ -328,7 +328,7 @@ def info():
     st.markdown(page_of_info, unsafe_allow_html=True)
 
     # 指定供应商名称范围
-    GYS_CHOOSE_LIST = ["介宏","方汇","樱花","荣硕","协创","all"]
+    GYS_CHOOSE_LIST = ["介宏","方汇","樱花","荣硕","协创","裕鹰","all"]
 
 
     # 建立供应商密码：键值对
