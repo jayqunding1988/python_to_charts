@@ -1,12 +1,10 @@
+"""市场数据分析页（占位）。"""
 import streamlit as st
 
 
-def page_2():
-    st.set_page_config(page_title="市场数据分析", page_icon=":chart_with_upwards_trend:")
+def main():
     st.write("市场数据分析")
 
 
-
-
 if __name__ == "__main__":
-    page_2()
+    main()

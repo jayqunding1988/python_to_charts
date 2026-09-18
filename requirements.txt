@@ -1,5 +1,5 @@
-streamlit
-streamlit_echarts
-pandas
-datetime
-openpyxl
+streamlit>=1.30
+streamlit_echarts>=0.4
+pandas>=2.0
+openpyxl>=3.1
+graphviz>=0.20
